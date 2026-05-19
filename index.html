@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="待办">
+<title>每日待办</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #f5f5f7;
+  --card: #ffffff;
+  --text: #1d1d1f;
+  --sub: #86868b;
+  --accent: #0071e3;
+  --accent-light: #e8f2fd;
+  --done: #34c759;
+  --divider: #e5e5ea;
+  --danger: #ff3b30;
+  --warn: #ff9500;
+  --tag-today: #0071e3;
+  --tag-tomorrow: #5856d6;
+  --shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-font-smoothing: antialiased;
+  padding-bottom: 100px;
+}
+
+/* ---- header ---- */
+header {
+  background: var(--card);
+  padding: 16px 20px;
+  position: sticky; top: 0; z-index: 10;
+  box-shadow: var(--shadow);
+  display: flex; align-items: center; justify-content: space-between;
+}
+header h1 { font-size: 20px; font-weight: 700; }
+.header-date { font-size: 14px; color: var(--sub); }
+
+/* ---- date tabs ---- */
+.tabs {
+  display: flex; gap: 0; padding: 12px 16px 0;
+  overflow-x: auto; scrollbar-width: none;
+}
+.tabs::-webkit-scrollbar { display: none; }
+.tab {
+  flex-shrink: 0; padding: 8px 18px; border-radius: 20px;
+  font-size: 14px; font-weight: 500; cursor: pointer;
+  background: var(--card); color: var(--text); border: 1px solid var(--divider);
+  margin-right: 8px; transition: all .15s; white-space: nowrap;
+  user-select: none; -webkit-user-select: none;
+}
+.tab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+.tab .badge {
+  display: inline-block; min-width: 20px; height: 20px; line-height: 20px;
+  border-radius: 10px; font-size: 12px; text-align: center;
+  background: rgba(0,0,0,0.08); margin-left: 4px; padding: 0 6px;
+}
+.tab.active .badge { background: rgba(255,255,255,0.25); }
+
+/* ---- section ---- */
+.section { margin: 16px 16px 0; }
+.section-title {
+  font-size: 13px; font-weight: 600; color: var(--sub);
+  text-transform: uppercase; letter-spacing: 0.5px;
+  padding: 4px 0 8px;
+}
+.card { background: var(--card); border-radius: 12px; box-shadow: var(--shadow); overflow: hidden; }
+
+/* ---- task item ---- */
+.task {
+  display: flex; align-items: flex-start; padding: 14px 16px;
+  border-bottom: 1px solid var(--divider); cursor: pointer;
+  transition: background .1s; -webkit-user-select: none; user-select: none;
+}
+.task:last-child { border-bottom: none; }
+.task:active { background: #f0f0f5; }
+.task.done .task-text { color: #c0c0c6; text-decoration: line-through; }
+.task .checkbox {
+  flex-shrink: 0; width: 24px; height: 24px; border-radius: 50%;
+  border: 2px solid #c7c7cc; margin-right: 12px; margin-top: 1px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .2s;
+}
+.task.done .checkbox { background: var(--done); border-color: var(--done); }
+.task.done .checkbox::after {
+  content: ''; width: 6px; height: 10px;
+  border: solid #fff; border-width: 0 2px 2px 0;
+  transform: rotate(45deg) translateY(-1px);
+}
+.task-body { flex: 1; min-width: 0; }
+.task-text { font-size: 15px; line-height: 1.5; word-break: break-word; }
+.task-note { font-size: 12px; color: var(--sub); margin-top: 2px; }
+.task-tag {
+  display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 8px;
+  border-radius: 10px; margin-left: 8px; flex-shrink: 0;
+}
+.tag-now { background: #fff2e8; color: #e87b2c; }
+.tag-key { background: #ffeaea; color: #e02e2e; }
+
+/* ---- add bar ---- */
+.add-bar {
+  position: fixed; bottom: 0; left: 0; right: 0; background: var(--card);
+  padding: 10px 16px; box-shadow: 0 -1px 4px rgba(0,0,0,0.06);
+  display: flex; gap: 10px; z-index: 10;
+}
+.add-bar input {
+  flex: 1; border: 1px solid var(--divider); border-radius: 10px;
+  padding: 10px 14px; font-size: 15px; outline: none; font-family: inherit;
+  background: var(--bg);
+}
+.add-bar input:focus { border-color: var(--accent); }
+.add-bar button {
+  flex-shrink: 0; padding: 10px 20px; background: var(--accent); color: #fff;
+  border: none; border-radius: 10px; font-size: 15px; font-weight: 600;
+  cursor: pointer; font-family: inherit;
+}
+.add-bar button:active { opacity: 0.8; }
+.add-hint { font-size: 11px; color: var(--sub); text-align: center; padding: 6px 0 0; }
+
+/* ---- progress bar ---- */
+.progress-wrap { padding: 8px 16px 0; }
+.progress-inner { display: flex; align-items: center; gap: 8px; }
+.progress-bar {
+  flex: 1; height: 6px; background: var(--divider); border-radius: 3px; overflow: hidden;
+}
+.progress-fill { height: 100%; background: var(--done); border-radius: 3px; transition: width .3s; }
+.progress-text { font-size: 13px; color: var(--sub); white-space: nowrap; }
+
+/* ---- delete zone ---- */
+.task .del-btn {
+  flex-shrink: 0; width: 28px; height: 28px; border-radius: 50%;
+  border: none; background: transparent; color: #c7c7cc; font-size: 18px;
+  cursor: pointer; display: none; align-items: center; justify-content: center;
+  margin-left: 4px; line-height: 1;
+}
+.task:active .del-btn, .task:hover .del-btn { display: flex; }
+.task .del-btn:active { background: #fee; color: var(--danger); }
+
+.empty { text-align: center; padding: 40px 20px; color: var(--sub); font-size: 14px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>📋 每日待办</h1>
+  <span class="header-date" id="headerDate">5月20日</span>
+</header>
+
+<div class="tabs" id="tabs"></div>
+<div class="progress-wrap" id="progressWrap" style="display:none">
+  <div class="progress-inner">
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+    <span class="progress-text" id="progressText"></span>
+  </div>
+</div>
+<div id="content"></div>
+<div style="height:80px"></div>
+
+<div class="add-bar">
+  <input type="text" id="addInput" placeholder="添加待办..." autocomplete="off">
+  <button id="addBtn">添加</button>
+</div>
+
+<script>
+// ============ 数据层 ============
+const STORAGE_KEY = 'dt_state_v2';
+const TASK_PREFIX = 't_';
+
+// 预置数据 — 我(Claude)每次更新这里
+// id 格式: t_YYYYMMDD_序号
+const PRESET = {
+  "2026-05-20": [
+    {id:"t_20260520_01", text:"检查种子液生长情况（昨晚21:00接种的12mL摇菌管）", tag:"now"},
+    {id:"t_20260520_02", text:"测种子液OD₆₀₀ → 计算实际OD → OD标准化至1.0", tag:"now"},
+    {id:"t_20260520_03", text:"超净台：按顺序加母液（乙酸钠→MgCl₂→Na₂S·9H₂O）→ 分装100mL/瓶 → 预热", tag:"now"},
+    {id:"t_20260520_04", text:"制备硫化物标准曲线（0-1.0 mg/L，7支比色管），R²≥0.995", tag:"now"},
+    {id:"t_20260520_05", text:"接种（2%种子液）→ 立即0h取样 → 放入摇床30°C/180rpm", tag:"key"},
+    {id:"t_20260520_06", text:"2h 取样（4mL/瓶：OD + S²⁻）", tag:""},
+    {id:"t_20260520_07", text:"4h 取样", tag:""},
+    {id:"t_20260520_08", text:"6h 取样", tag:""},
+    {id:"t_20260520_09", text:"8h 取样", tag:""},
+    {id:"t_20260520_10", text:"10h 取样（若来不及可延至12h）", tag:""},
+    {id:"t_20260520_11", text:"整理OD₆₀₀和S²⁻数据 → 画降解曲线 → 判断最佳初筛时间点", tag:"key"},
+    {id:"t_20260520_12", text:"晚上：服务器装 ncbi-datasets-cli", tag:""},
+    {id:"t_20260520_13", text:"拍照留存比色管显色结果（原始数据备份）", tag:""},
+  ],
+  "2026-05-21": [
+    {id:"t_20260521_01", text:"[待定] 若12h降解率>30% → 40+株脱硫菌单点定性初筛", tag:""},
+    {id:"t_20260521_02", text:"[待定] 若降解率<30% → 提高种子液OD至1.8-2.0重新验证", tag:""},
+    {id:"t_20260521_03", text:"下载 P. denitrificans PD1222 蛋白序列（KEGG学习）", tag:""},
+    {id:"t_20260521_04", text:"下载 C. glutamicum ATCC 13032 蛋白序列", tag:""},
+    {id:"t_20260521_05", text:"上传PD1222蛋白序列到BlastKOALA → 看map00910氮代谢通路图", tag:""},
+  ],
+  "2026-05-22": [
+    {id:"t_20260521_05", text:"下载 Acinetobacter oleivorans AHP123 蛋白序列 → 对比PD1222差异", tag:""},
+    {id:"t_20260521_06", text:"整理HN-AD关键基因K号清单（narG/napA/nirK/norB/nosZ等）", tag:""},
+  ]
+};
+
+// 初始化/更新日期列表
+function allDates() {
+  const d = new Set(Object.keys(PRESET));
+  const saved = loadState();
+  for (const id of Object.keys(saved.tasks || {})) {
+    d.add(idToDate(id));
+  }
+  return [...d].sort();
+}
+
+function idToDate(id) { return id.slice(2,10).replace(/(\d{4})(\d{2})(\d{2})/,'$1-$2-$3'); }
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : { tasks:{}, customDates:[] };
+  } catch { return { tasks:{}, customDates:[] }; }
+}
+
+function saveState(s) { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); }
+
+function taskDone(id) {
+  const s = loadState();
+  return !!(s.tasks[id] && s.tasks[id].done);
+}
+
+function getDateTasks(date) {
+  const s = loadState();
+  const preset = PRESET[date] || [];
+  const result = [];
+  const seen = new Set();
+
+  // 先放用户自建任务
+  for (const id of Object.keys(s.tasks)) {
+    const t = s.tasks[id];
+    if (t.date === date && !preset.find(p => p.id === id)) {
+      result.push({ id, text: t.text, tag: '', done: !!t.done, custom: true });
+      seen.add(id);
+    }
+  }
+  // 再放预置任务
+  for (const p of preset) {
+    const done = taskDone(p.id);
+    result.push({ id: p.id, text: p.text, tag: p.tag || '', done, custom: false });
+    seen.add(p.id);
+  }
+  return result;
+}
+
+function toggleTask(id) {
+  const s = loadState();
+  if (!s.tasks[id]) s.tasks[id] = { date: idToDate(id), text: '', done: false };
+  s.tasks[id].done = !s.tasks[id].done;
+  saveState(s);
+}
+
+function addCustomTask(date, text) {
+  const s = loadState();
+  const idx = Object.keys(s.tasks).filter(k => s.tasks[k].date === date && !PRESET[date]?.find(p=>p.id===k)).length + 1;
+  const id = `t_${date.replace(/-/g,'')}_c${idx}`;
+  s.tasks[id] = { date, text, done: false };
+  saveState(s);
+  return id;
+}
+
+function deleteTask(id) {
+  const s = loadState();
+  delete s.tasks[id];
+  saveState(s);
+}
+
+// ============ 渲染 ============
+let activeDate = '';
+
+function render() {
+  const dates = allDates();
+  if (!dates.length) { document.getElementById('content').innerHTML = '<div class="empty">暂无待办</div>'; return; }
+
+  // 默认选今天
+  const today = new Date().toISOString().slice(0,10);
+  if (!activeDate || !dates.includes(activeDate)) {
+    activeDate = dates.includes(today) ? today : dates[0];
+  }
+
+  // tabs
+  const tabsEl = document.getElementById('tabs');
+  tabsEl.innerHTML = dates.map(d => {
+    const tasks = getDateTasks(d);
+    const undone = tasks.filter(t => !t.done).length;
+    const isToday = d === today;
+    const label = isToday ? '今天' : formatDate(d);
+    return `<span class="tab${d===activeDate?' active':''}" data-date="${d}">
+      ${label}${undone>0?`<span class="badge">${undone}</span>`:''}
+    </span>`;
+  }).join('');
+
+  // body
+  const tasks = getDateTasks(activeDate);
+  const done = tasks.filter(t => t.done).length;
+  const total = tasks.length;
+  const pct = total ? Math.round(done/total*100) : 0;
+
+  document.getElementById('progressWrap').style.display = total ? 'block' : 'none';
+  document.getElementById('progressFill').style.width = pct+'%';
+  document.getElementById('progressText').textContent = `${done}/${total}`;
+  document.getElementById('headerDate').textContent = formatDateLong(activeDate);
+
+  const now = tasks.filter(t => t.tag==='now' && !t.done);
+  const key = tasks.filter(t => t.tag==='key' && !t.done);
+  const rest = tasks.filter(t => !t.tag && !t.done);
+  const doneAll = tasks.filter(t => t.done);
+
+  function taskHtml(t) {
+    const tagHtml = t.tag==='now' ? '<span class="task-tag tag-now">进行中</span>'
+      : t.tag==='key' ? '<span class="task-tag tag-key">关键</span>' : '';
+    return `<div class="task${t.done?' done':''}" data-id="${t.id}">
+      <div class="checkbox"></div>
+      <div class="task-body"><div class="task-text">${esc(t.text)}</div></div>
+      ${tagHtml}
+      ${t.custom?`<button class="del-btn">&times;</button>`:''}
+    </div>`;
+  }
+
+  let html = '';
+  if (now.length) html += `<div class="section"><div class="section-title">⚡ 正在进行</div><div class="card">${now.map(taskHtml).join('')}</div></div>`;
+  if (key.length) html += `<div class="section"><div class="section-title">🔴 关键节点</div><div class="card">${key.map(taskHtml).join('')}</div></div>`;
+  if (rest.length) html += `<div class="section"><div class="section-title">📝 待完成</div><div class="card">${rest.map(taskHtml).join('')}</div></div>`;
+  if (doneAll.length) {
+    html += `<div class="section"><details><summary class="section-title" style="cursor:pointer;display:inline-block">✅ 已完成 (${doneAll.length})</summary>`;
+    html += `<div class="card" style="margin-top:8px">${doneAll.map(taskHtml).join('')}</div></details></div>`;
+  }
+  if (!html) html = '<div class="empty">🎉 全部完成！</div>';
+
+  document.getElementById('content').innerHTML = html;
+}
+
+function formatDate(d) {
+  const [y,m,dd] = d.split('-');
+  const today = new Date().toISOString().slice(0,10);
+  if (d === today) return '今天';
+  const tomorrow = new Date(Date.now()+86400000).toISOString().slice(0,10);
+  if (d === tomorrow) return '明天';
+  return `${parseInt(m)}月${parseInt(dd)}日`;
+}
+
+function formatDateLong(d) {
+  const today = new Date().toISOString().slice(0,10);
+  const w = ['日','一','二','三','四','五','六'];
+  const dt = new Date(d);
+  const label = d===today?'今天':d===new Date(Date.now()+86400000).toISOString().slice(0,10)?'明天':'';
+  return `${parseInt(d.slice(5,7))}月${parseInt(d.slice(8,10))}日 周${w[dt.getDay()]}`;
+}
+
+function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// ============ 事件 ============
+document.getElementById('tabs').addEventListener('click', e => {
+  const tab = e.target.closest('.tab');
+  if (!tab) return;
+  activeDate = tab.dataset.date;
+  render();
+});
+
+document.getElementById('content').addEventListener('click', e => {
+  const task = e.target.closest('.task');
+  if (!task) return;
+  if (e.target.closest('.del-btn')) {
+    if (confirm('删除这条待办？')) {
+      deleteTask(task.dataset.id);
+      render();
+    }
+    return;
+  }
+  toggleTask(task.dataset.id);
+  render();
+});
+
+document.getElementById('addBtn').addEventListener('click', () => {
+  const input = document.getElementById('addInput');
+  const text = input.value.trim();
+  if (!text) return;
+  addCustomTask(activeDate, text);
+  input.value = '';
+  render();
+  document.getElementById('addInput').focus();
+});
+
+document.getElementById('addInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('addBtn').click();
+});
+
+// ============ PWA 点击空白创建任务 ============
+document.querySelector('.add-bar').addEventListener('touchstart', function(e) {
+  // let input work
+});
+
+render();
+</script>
+</body>
+</html>
