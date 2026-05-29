@@ -181,50 +181,31 @@ const TASK_PREFIX = 't_';
 // 预置数据 — 我(Claude)每次更新这里
 // id 格式: t_YYYYMMDD_序号
 const PRESET = {
-  "2026-05-19": [
-    {id:"t_20260519_01", text:"[已完成] 探路菌失败：透气膜+NaHCO₃ 5g/L+180rpm → CK 4h S²⁻ 106.8→0.01 mg/L 归零", tag:""},
-    {id:"t_20260519_02", text:"[已完成] 根因定位：NaHCO₃ 5g/L灭菌→Na₂CO₃ pH 8.5+ 加速 HS⁻ 化学氧化；方案：去掉NaHCO₃，利用原有磷酸盐（Na₂HPO₄·12H₂O 2.5g+KH₂PO₄ 1.2g）锁pH 7.0-7.2", tag:""},
-    {id:"t_20260519_03", text:"[已完成] 新配方：乙酸钠5g+NH₄Cl 0.5g+Na₂HPO₄·12H₂O 2.5g+KH₂PO₄ 1.2g+NaCl 1.0g+酵母浸粉0.2g+MgCl₂·6H₂O 0.2g, 磷酸盐锁pH 7.0-7.2, S²⁻ 100mg/L, 150rpm", tag:""},
-    {id:"t_20260519_04", text:"[已完成] 下单DMPD×2瓶；找到库存橡胶塞×4（含500mL用）+硅胶塞→物流约束解除，实验可提前", tag:""},
-    {id:"t_20260519_05", text:"[已完成] 师兄传授报纸+硅胶塞法（培养魏氏梭菌成功）→替代橡胶塞做密封组，更接近堆肥限氧微环境", tag:""},
-    {id:"t_20260519_06", text:"[已完成] 写实验记录：原始数据+根因分析+张梦娜配方截图+改进方案；早休息", tag:""},
+  "2026-05-30": [
+    {id:"t_20260530_01", text:"JS-1论文中英对照翻译docx已生成 → 每日文献/2026-05-29/", tag:""},
+    {id:"t_20260530_02", text:"project_backup.md全面复核 → 修正3处菌种错误（YLY1B-1N=C.xerosis非C.glutamicum；MLY2A-2N=C.glutamicum非A.pseudolwoffii；81.93%为MLY1A-2N非YLY1A-2N）", tag:""},
+    {id:"t_20260530_03", text:"全基因组8株确认：4株C.glutamicum+1株C.xerosis+1株A.indicus+1株Acinetobacter sp.+1株G.soli", tag:""},
+    {id:"t_20260530_04", text:"MLY1A-1N (A.indicus) KEGG分析完成 → 同化主导型，缺amo/hao/nirS/nirK/norB/nosZ，ANR完整", tag:""},
+    {id:"t_20260530_05", text:"MLY2A-2N (C.glutamicum) KEGG分析完成 → 同化主导型，ANR缺，ASR完整(5/5)", tag:""},
+    {id:"t_20260530_06", text:"两株KEGG均为同化型 → 如8株都非经典HN-AD，论文框架转向"同化主导型非经典HN-AD途径的普遍性"", tag:""},
+    {id:"t_20260530_07", text:"CLAUDE.md更新 → 记录工具脚本目录和每日文献翻译流程", tag:""},
+    {id:"t_20260530_08", text:"pubMLST：MLY2B-3N=G.soli(82%)偏低 → 需16S BLAST+ANI进一步确认 | MLY2B-1N=Acinetobacter sp.属确认种待定", tag:""},
+    {id:"t_20260530_09", text:"eggNOG数据库已上传guest504 → 明天解压 | 本地大文件待split分包传506liu", tag:"key"},
   ],
-  "2026-05-20": [
-    {id:"t_20260520_01", text:"清点库存：乙酸钠/KH₂PO₄/Na₂HPO₄·12H₂O/NH₄Cl/NaCl/酵母浸粉/MgCl₂·6H₂O → 缺什么领什么", tag:"key"},
-    {id:"t_20260520_02", text:"检查Na₂S·9H₂O原瓶→晶体发黄或潮解结块则开新瓶（变质=称量不准=S²⁻浓度不准，上次CK异常潜在因素）", tag:"key"},
-    {id:"t_20260520_03", text:"耗材盘点：25mL比色管≥30支 + 0.22μm滤膜+注射器≥5套 + 2mL离心管≥50个 + 1mL枪头≥50个", tag:""},
-    {id:"t_20260520_04", text:"跟踪DMPD物流：5/19晚下单→预计5/21到，确认无延误（DMPD是硬约束——不到就测不了S²⁻）", tag:"key"},
-    {id:"t_20260520_05", text:"洗烘6个250mL三角瓶→配1L新配方培养基（原配方去NaHCO₃，磷酸盐缓冲pH 7.0-7.2）→分装6瓶×100mL→121°C 20min灭菌→冷却后测pH应在7.0-7.2", tag:"key"},
-    {id:"t_20260520_06", text:"压瓶子封口：2个裸硅胶塞（半透气）+ 2个透气膜（高氧）+ 2个硅胶塞+报纸（师兄法→近密封）", tag:"key"},
-    {id:"t_20260520_07", text:"测试500mL橡胶塞能否用在250mL瓶上→注水倒置测密闭性；报纸+硅胶塞标准化操作确认", tag:""},
-    {id:"t_20260520_08", text:"写好全部编号标签：A1-A3(CK)/B1-B3(接菌)×0h/6h/12h×S/O = 36管标签", tag:""},
-    {id:"t_20260520_09", text:"KEGG BlastKOALA：传脱氮菌蛋白序列→看map00910氮代谢通路→整理napA/nirK/nirS/norB/nosZ的K号清单", tag:""},
+  "2026-05-31": [
+    {id:"t_20260531_01", text:"guest504解压eggNOG数据库 → 确认路径+磁盘空间", tag:"key"},
+    {id:"t_20260531_02", text:"批量跑8株faa的eggNOG-mapper → 产出KEGG/GO注释文件", tag:"key"},
+    {id:"t_20260531_03", text:"提取MLY2B-3N和MLY2B-1N的16S rRNA（barrnap）→ NCBI BLAST确定参考基因组", tag:"key"},
+    {id:"t_20260531_04", text:"本地eggNOG大文件split分包 → 传506liu（3G×7块分片+2小文件）", tag:""},
+    {id:"t_20260531_05", text:"整理MLY1A-1N vs MLY2A-2N KEGG氮代谢差异对比表（A.indicus有ANR vs C.glutamicum无ANR）", tag:""},
+    {id:"t_20260531_06", text:"查文献：Corynebacterium glutamicum氮代谢特征 → GS-GOGAT发达=工业谷氨酸生产菌 → 解释95%+降解率", tag:""},
   ],
-  "2026-05-21": [
-    {id:"t_20260521_01", text:"收货DMPD×2瓶：检查瓶口密封完好→4°C避光保存（DMPD怕光怕氧，密封一破就失效）", tag:"key"},
-    {id:"t_20260521_02", text:"标曲练习：25mL体系，10mg/L工作液0/0.25/0.50/1.00/1.50/2.00/2.50mL→7点，R²≥0.995才算过", tag:""},
-    {id:"t_20260521_03", text:"培养基pH复核：取一瓶昨天配的培养基，确认pH仍在7.0-7.2范围内（磷酸盐缓冲过夜无漂移=稳定）", tag:""},
-    {id:"t_20260521_04", text:"晚上：从4°C划线板挑Lysinibacillus单菌落→BHI 5mL→30°C 180rpm过夜（约12-16h，明早对数期）", tag:""},
-    {id:"t_20260521_05", text:"最终检查：培养箱空位+摇床150rpm+全部耗材就位，明早8:00直接开始", tag:"key"},
-  ],
-  "2026-05-22": [
-    {id:"t_20260522_01", text:"8:00到→称0.15g Na₂S·9H₂O（晶体必须透明！）→溶于5mL无菌水→0.22μm过滤→分装6瓶加Na₂S→0h取样基线", tag:"key"},
-    {id:"t_20260522_02", text:"当天现做标曲：25mL体系7点，R²≥0.995（不拿昨天标曲凑合——DMPD溶液每天有变化）", tag:""},
-    {id:"t_20260522_03", text:"9:00 种子液测OD₆₀₀→生理盐水调至OD₆₀₀≈1.0→组4-6接菌2mL（2% v/v）→6瓶按封口进摇床30°C 150rpm", tag:"key"},
-    {id:"t_20260522_04", text:"9:00-15:00空档→可做KEGG分析或写论文提纲；15:00 6h取样→快速估算各组S²⁻剩余率", tag:""},
-    {id:"t_20260522_05", text:"21:00 12h取样→当晚算出6组×3时间点=18个S²⁻数据点+OD₆₀₀", tag:"now"},
-    {id:"t_20260522_06", text:"判据：组1(CK-裸硅胶塞)12h S²⁻≥80mg/L→配方通过；50-80→查pH偏离；<50→排查。当晚把6组数据表发我", tag:"key"},
-  ],
-  "2026-05-23": [
-    {id:"t_20260523_01", text:"分析6组数据→量化封口类型×S²⁻稳定性关系；对比裸硅胶/透气膜/报纸+硅胶三组的CK降解率", tag:"key"},
-    {id:"t_20260523_02", text:"若CK通过：上午接4株脱硫菌种子液BHI 5mL×4（Lysinibacillus/Glutamicibacter/Bacillus各选代表）→为周六探路菌准备", tag:""},
-    {id:"t_20260523_03", text:"若CK未通过：排查方向→①pH是否偏离？②煮沸除氧水配Na₂S母液？③换棉塞？④降120rpm？→联系我讨论", tag:""},
-    {id:"t_20260523_04", text:"整理全部数据+分析+下一步方案，发我", tag:""},
-  ],
-  "2026-05-24": [
-    {id:"t_20260524_01", text:"若CK通过：探路菌实验→4株菌+1CK，0/2/4/6/8/12h共6点×5瓶=30个S²⁻样+OD", tag:"key"},
-    {id:"t_20260524_02", text:"若CK未通过：排查实验→单变量测试（煮沸除氧/换棉塞/降转速）", tag:""},
-    {id:"t_20260524_03", text:"画S²⁻-时间曲线+OD-时间曲线→确定最佳初筛窗口；下午休息", tag:""},
+  "2026-06-01": [
+    {id:"t_20260601_01", text:"eggNOG结果汇总 → 8株菌氮代谢基因矩阵表（glnA/gltB/gdhA/nasA/nirBD/amo/hao/narG/nirS/norB/nosZ检出热图）", tag:"key"},
+    {id:"t_20260601_02", text:"生成8株菌氮代谢基因热图 → 论文第四章核心Figure", tag:"key"},
+    {id:"t_20260601_03", text:"16S BLAST结果→下载type strain参考基因组→FastANI鉴定MLY2B-3N和MLY2B-1N", tag:""},
+    {id:"t_20260601_04", text:"若506liu传完：服务器端跑eggNOG-mapper分担guest504压力", tag:""},
+    {id:"t_20260601_05", text:"确定氮平衡实验方案（参照JS-1论文：血清瓶+纯氧+24h→同化占比=胞内氮增量/NH4+减少量）→列耗材清单", tag:""},
   ]
 };
 
